@@ -1,0 +1,3 @@
+Color Test:
+	Output:
+		Draw every color in line (start point: (10,10), 10 px of every color: white, red, green, blue, yellow, cyan, purple, black)

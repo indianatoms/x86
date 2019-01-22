@@ -1,0 +1,3 @@
+Color Test:
+	Output:
+		Draw red rectangle on edges

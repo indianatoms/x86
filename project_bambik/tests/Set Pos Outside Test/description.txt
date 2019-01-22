@@ -1,0 +1,3 @@
+Set Pos Outside The Board and Try to Draw Test:
+	Output:
+		Half of the edges are red, but there is nothing extra going left after set pos outside the board

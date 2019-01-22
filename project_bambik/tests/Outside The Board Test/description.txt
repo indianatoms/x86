@@ -1,0 +1,3 @@
+Outside The Board Test:
+	Output:
+		Black line, try to leave the board and fail
