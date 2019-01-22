@@ -10,6 +10,8 @@ turtle:
 	push	ebp
 	mov	ebp, esp
 
+	
+
 		mov	esi, 0			;reset esi
 		mov	ecx, 0			;reset ecx
 		mov	cl, -2
@@ -83,6 +85,47 @@ turtle:
 		jmp 	loop
 ;=========================================================================================
 	command_set_pen_state:
+		
+	;COLORS	
+		
+		mov 	eax, [ebp+12]		;set eax to commands start
+		movzx	edi, cl
+		add	eax, edi		;advance eax to current instruciton
+		mov	eax, [eax]		;load the value of eax
+		rol	ecx, 16
+
+		;rol	eax ,16
+		shr	ax, 8		;offset bits
+		shl	ax, 12			;offset bits
+		mov	cx, ax			;set color bits
+
+		mov 	eax, [ebp+12]		;set eax to commands start
+		movzx	edi, cl
+		add	eax, edi		;advance eax to current instruciton
+		mov	eax, [eax]		;load the value of eax
+		
+		;rol	eax ,16
+
+		shr	ax, 12			;offset bits
+		shl	ax, 8			;offset bits
+
+		add	cx,ax
+
+		mov 	eax, [ebp+12]		;set eax to commands start
+		movzx	edi, cl
+		add	eax, edi		;advance eax to current instruciton
+		mov	eax, [eax]		;load the value of eax
+
+		;rol	eax ,16		
+		shl	ax, 12			;offset bits
+		shr	ax, 8			;offset bits
+
+		add	cx,ax
+
+		
+
+		rol	ecx, 16			;revert ecx after saving		
+	;UPDOWN
 		mov 	eax, [ebp+12]		;set eax to commands start
 		movzx	edi, cl
 		add	eax, edi		;advance eax to current instruciton
@@ -92,20 +135,12 @@ turtle:
 		shr	al, 7			;ud bit of command
 		
 		rol	ecx, 16			;prepare ecx for saving
-		mov	cl, al			;set ud
+		shl	ecx, 1			;clear ud
+		shr	ecx, 1			;clear up
+		add	cl, al			;set ud
 
-		rol	ecx, 16
-		mov 	eax, [ebp+12]		;set eax to commands start
-		movzx	edi, cl
-		add	eax, edi		;advance eax to current instruciton
-		mov	eax, [eax]		;load the value of eax
-		rol	ecx, 16
-
-
-		shl	ax, 4			;rgb bits of command
-
-		add	cx, ax			;set color bits
-		rol	ecx, 16			;revert ecx after saving		
+		rol	ecx, 16			;after save
+			
 
 		jmp 	loop
 ;=========================================================================================
@@ -139,9 +174,15 @@ turtle:
 			jge	move_error		;Error: y>=50
 
 			rol	ecx, 16			;prepare ecx for reading ud
-			cmp	cl, 0
-			je	move_paint
+			mov	edi,ecx
+			shl	edi,31
+			shr	edi,31
+
 			rol	ecx, 16			;invert ecx after reading ud
+			
+			cmp	edi, 0
+			je	move_paint
+			
 		move_continue:
 			cmp	ch, 3
 			je	move_right
@@ -155,7 +196,6 @@ turtle:
 			jmp 	move_loop
 
 		move_paint:
-			rol	ecx, 16			;invert ecx after reading ud
 			mov 	edx, 0			;reset edx
 			mov 	edi, 0			;reset edi
 					
@@ -177,21 +217,40 @@ turtle:
 
 			mov 	eax, DWORD [edx]	;read 4 bytes in to eax
 			
-			;rol 	ecx, 16			;prepare ecx for reading color			
-			;rol	eax, 16			;prepare eax for reading 1 byte of other channel color
+			rol 	ecx, 16			;prepare ecx for reading color			
+			rol	eax, 16			;prepare eax for reading 1 byte of other channel color
 	
-			;movzx 	edi, ah			;save 1 byte of other channel color to edi
-
-			;mov 	eax, ecx
+			movzx 	edi, ah			;save 1 byte of other channel color to edi
 			
+			rol	eax, 16
+
+		;SET COLOR
+			mov	ax,cx	
+			shr	ax,12
+			shl	ax,12
+			shl	eax,8
+			
+			mov	ax,cx
+			shr	ax,8
+			shl	ax,12
+			shl	eax,8
+
+			mov	ax,cx
+			shr	ax,4
+			shl	ax,12
+			shl	eax,4
+
+			;mov	edx, eax
+			;jmp	end
+
 		finish_setting_color:
-			;rol 	eax, 8			;prepare eax for good color restore		
-			;add	eax, edi		;restore saved channel color
-			;rol 	eax, 24			;invert eax after restoring color
+			rol 	eax, 8			;prepare eax for good color restore		
+			add	eax, edi		;restore saved channel color
+			rol 	eax, 24		;invert eax after restoring color
 
-			;rol 	ecx, 16			;invert ecx after reading color	
+			rol 	ecx, 16			;invert ecx after reading color	
 			
-			mov	eax,0
+
 
 			mov 	DWORD [edx], eax	;store eax in bitmap  
 
@@ -230,6 +289,6 @@ turtle:
 		jmp 	loop
 ;=========================================================================================
 end:
-	mov	eax, edx
+	mov	eax, 0
 	pop	ebp
 	ret
