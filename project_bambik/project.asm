@@ -225,23 +225,23 @@ turtle:
 			rol	eax, 16
 
 		;SET COLOR
-			mov	ax,cx	
-			shr	ax,12
-			shl	ax,12
-			shl	eax,8
+           
+           
+       		;RED
+        		mov al,ch
+			shr al,4
+        		shl al,4		;rrrr0000
+        		mov     BYTE [edx + 0], al;store eax in bitmap
+        	;GREEN 
+			mov al,ch
+            		shr al,4        ;gggg0000
 			
-			mov	ax,cx
-			shr	ax,8
-			shl	ax,12
-			shl	eax,8
-
-			mov	ax,cx
-			shr	ax,4
-			shl	ax,12
-			shl	eax,4
-
-			;mov	edx, eax
-			;jmp	end
+            		mov     BYTE [edx + 1], al  ;store eax in bitmap
+        	;BLUE
+            		mov al,cl
+        				;bbbb0000
+            		mov     BYTE [edx + 2], al;store eax in bitmap
+            
 
 		finish_setting_color:
 			rol 	eax, 8			;prepare eax for good color restore		

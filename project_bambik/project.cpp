@@ -13,6 +13,9 @@
   (byte & 0x01 ? '1' : '0') 
 
 extern "C" int turtle(unsigned char *dest_bitmap, unsigned char *commands, unsigned int commands_size);
+//bitmap [ebp+8]
+//commands [ebp+12]
+//commands_size [ebp+16]
 
 void print_binary(int number);
 
